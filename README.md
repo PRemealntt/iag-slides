@@ -18,18 +18,27 @@ Antes de instalar, comprueba que tienes:
 - **LibreOffice** (opcional pero recomendado): permite revisar visualmente las slides antes de entregarlas. Sin él, el .pptx se genera igual pero no se renderiza para revisión.
 
 ## Instalación
-Escribe estos comandos dentro de Claude Code, uno a uno:
+**Desde la app de escritorio de Claude Code (gestor de plugins):**
+1. Abre el gestor de plugins (escribe `/plugin` en la caja de mensajes o usa el menú de plugins).
+2. Elige **Añadir marketplace** y, entre las opciones, **GitHub**. Escribe `PRemealntt/iag-slides` y confirma.
+3. Abre el marketplace **iag-transform**, localiza **iag-slides** e instálalo con **Instalar por mí** (queda disponible en todos tus proyectos).
+4. Abre una **sesión nueva** y ya puedes usarlo.
 
+**Desde la terminal (`claude`):**
 ```
 /plugin marketplace add PRemealntt/iag-slides
 /plugin install iag-slides@iag-transform
 ```
-
-Reinicia Claude Code (o ejecuta `/reload-plugins`) y ya está disponible.
+Después reinicia Claude Code o ejecuta `/reload-plugins`.
 
 ## Actualización
-Cuando se publique una versión nueva:
+Cuando se publique una versión nueva (el número de versión sube) hay que hacer dos cosas, en este orden:
+1. En el gestor de plugins, **sincroniza el marketplace** `iag-transform` (botón *Sincronizar*). Sin esto, el plugin no sabe que hay algo nuevo.
+2. Abre **iag-slides** y pulsa **Actualizar**.
 
+Después abre una **sesión nueva**: las sesiones que ya estaban abiertas siguen con la versión anterior. Si el botón de actualizar no aparece, desinstala el plugin, elimina el marketplace y vuelve a añadirlo.
+
+Por terminal:
 ```
 /plugin marketplace update iag-transform
 /plugin update iag-slides@iag-transform
