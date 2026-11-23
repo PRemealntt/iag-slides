@@ -646,6 +646,21 @@ class Deck:
     def __init__(self, template=TEMPLATE):
         self.prs = Presentation(template)
         self._layouts = {l.name: l for l in self.prs.slide_layouts}
+        self._has_cover = False
+        self._has_end = False
+        self._strip_sections()
+
+    def _strip_sections(self):
+        """The template carries PowerPoint sections of its own ('Guides and Guidelines...',
+        'About the template'...) that point to deleted slides. Remove them so the deck has no
+        section headers between slides."""
+        pres = self.prs.part._element
+        for ext in list(pres.iter(qn("p:ext"))):
+            if ext.find(".//{http://schemas.microsoft.com/office/powerpoint/2010/main}sectionLst") is not None:
+                parent = ext.getparent()
+                parent.remove(ext)
+                if len(parent) == 0:
+                    parent.getparent().remove(parent)
 
     # -- layouts -------------------------------------------------------------------------
     def layout(self, name):
@@ -691,6 +706,7 @@ class Deck:
                 ph.text_frame.text = subtitle
         self._footer_placeholders(s)
         self._clean_placeholders(s)
+        self._has_cover = True
         return s
 
     def content_slide(self, title, subtitle="", layout="Title and Content (Subtitle)"):
@@ -733,8 +749,14 @@ class Deck:
         s = self._new(layout)
         self._footer_placeholders(s)
         self._clean_placeholders(s)
+        self._has_end = True
         return s
 
     def save(self, path):
+        """Every deck must have a cover (first) and a closing slide (last)."""
+        if not self._has_cover:
+            raise ValueError("Deck has no cover: call deck.title_slide(...) first, before any other slide.")
+        if not self._has_end:
+            self.end_slide()   # closing slide has no content to fill in: add it automatically
         self.prs.save(path)
         return path

@@ -17,7 +17,7 @@ Read these before building (progressive disclosure, load only what the task need
 ## Workflow
 
 1. **Clarify the content, not the format.** Identify purpose, audience, number of slides, the data and the message. If the user gave a document, notes or numbers, read them fully first. Ask at most one short question if something blocks the work (for example no data for a chart); otherwise decide and state assumptions at the end.
-2. **Plan the storyline.** One message per slide. Typical deck: title → content slides (executive summary first for 5+ slides) → next steps → end slide. Write each slide as: title `Topic | Subtopic` and an orange subtitle that states the conclusion ("so what") in one sentence.
+2. **Plan the storyline.** One message per slide. Typical deck: cover → content slides (executive summary first for 5+ slides) → next steps → closing slide (cover and closing are mandatory; no dividers unless asked). Write each slide as: title `Topic | Subtopic` and an orange subtitle that states the conclusion ("so what") in one sentence.
 3. **Pick a pattern per slide** from `references/patterns.md`. Favour the reference patterns whenever the content fits their structure (KPIs + chart + insights, A-vs-B comparison, opportunity with cards and next steps, numbered Q&A grid, scenario comparison, dark photo slide with lever cards, chevron timeline). Vary patterns across the deck. If the content does not fit any of them (long narrative, a single big chart, a dense table, a process with many steps), choose a different layout from `references/layouts.md` or compose from the components, keep the same visual language, and mention the choice to the user in one line.
 4. **Write the build script** (python, kept outside the output folder), import the library, build slides, save the `.pptx`:
    ```python
@@ -40,7 +40,8 @@ Read these before building (progressive disclosure, load only what the task need
 ## Hard rules
 
 - **Information slides have a plain white background (house rule).** Every slide that carries content (text, KPIs, charts, tables, cards) is white: no photos, no dark or coloured full-slide backgrounds, no overlays. Dark appears only as cards, bands and headers on the white slide. Information slides are always white, whatever the pattern looks like elsewhere.
-- **Structural slides keep the template format:** the cover (`title_slide`, photo layout), the closing slide (`end_slide`, always last), section/annex dividers (`divider_slide`, e.g. "Appendix") and single-statement slides keep their original template look. Standard deck: cover → information slides (white) → optional dividers (e.g. before an Appendix) → closing slide.
+- **Every deck has a cover and a closing slide, always.** The cover (`title_slide`, photo layout) is the first slide and the closing slide (`end_slide`) the last, whatever the length of the deck (even 1–3 content slides). They keep the template look. `Deck.save()` refuses to save without a cover and adds the closing slide if you forgot it.
+- **No section dividers and no PowerPoint sections.** Do not create `divider_slide` slides or section headers between slides unless the user explicitly asks for them (e.g. "add an Appendix divider"). Standard deck: cover → information slides (white) → closing slide. `Deck` already strips the template's own leftover PowerPoint sections; never add new ones. Single-statement slides (`statement_slide`) keep their template look and are used only when the user asks for one.
 
 - Colours only from the palette in `design-system.md`; orange is the single accent and is used to highlight, not to fill big areas (except title/divider layouts).
 - Arial only (theme fonts). Titles 32 pt bold via the layout placeholder; never restyle placeholders by hand.

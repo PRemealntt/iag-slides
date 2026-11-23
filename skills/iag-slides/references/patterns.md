@@ -54,7 +54,8 @@ White slide; title + orange sub-title + 2 × 3 grid of `F2F7F8` tiles (asphalt t
 Whenever a supplier or group company is named, show its logo loose (no frame), as in the reference slides: `logo_group(s, "Integrator", [...], x, y, w, cols=3, dimmed=("AJW",))` for a supplier panel with role labels (INTEGRATOR / OEM) and faded non-participants; `logo_chip(s, name, x, y, w, h)` under each bar or column of a chart, or in a card header; `logo_row` for a strip. When two suppliers are combined, stack both logos with a small "+" between them. Typical uses: supplier comparison (one logo per bar/column), market overview, proposal per supplier. See `assets.md` for the bundled list and how to add more.
 
 ## P12 Dividers, statements and closing
-- These keep the template look (not white): `deck.divider_slide("Appendix", "2")` for decks > 8 slides or before an annex, `deck.statement_slide("One sentence")` for a single message, `deck.end_slide()` — "Together we transform aviation" closing slide, always last.
+- These keep the template look (not white). `deck.end_slide()` — "Together we transform aviation" closing slide — is mandatory and always last, as the cover (`title_slide`) is mandatory and always first.
+- `deck.divider_slide("Appendix", "2")` and `deck.statement_slide("One sentence")` exist but are used **only when the user explicitly asks** for a divider or a single-statement slide. By default a deck has no dividers or sections between slides.
 
 ## Building blocks not wrapped by a helper
 Compose them from `box`, `add_text`, `icon_tile`, `hline/vline`:
