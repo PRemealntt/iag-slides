@@ -752,11 +752,25 @@ class Deck:
         self._has_end = True
         return s
 
+    def _tag_language(self, lang):
+        """Mark every text run as `lang` so PowerPoint's proofing uses British English."""
+        for slide in self.prs.slides:
+            root = slide._element
+            for r in root.iter(qn("a:r")):
+                rpr = r.find(qn("a:rPr"))
+                if rpr is None:
+                    rpr = etree.Element(qn("a:rPr"))
+                    r.insert(0, rpr)
+                rpr.set("lang", lang)
+            for el in root.iter(qn("a:endParaRPr")):
+                el.set("lang", lang)
+
     def save(self, path):
         """Every deck must have a cover (first) and a closing slide (last)."""
         if not self._has_cover:
             raise ValueError("Deck has no cover: call deck.title_slide(...) first, before any other slide.")
         if not self._has_end:
             self.end_slide()   # closing slide has no content to fill in: add it automatically
+        self._tag_language("en-GB")
         self.prs.save(path)
         return path

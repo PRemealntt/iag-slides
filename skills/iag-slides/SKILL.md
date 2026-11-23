@@ -50,6 +50,7 @@ Read these before building (progressive disclosure, load only what the task need
 
 - Colours only from the palette in `design-system.md`; orange is the single accent and is used to highlight, not to fill big areas (except title/divider layouts).
 - Arial only (theme fonts). Titles 32 pt bold via the layout placeholder; never restyle placeholders by hand.
+- **All slide content is in British English (en-GB), whatever language the user writes in.** Titles, subtitles, labels, chart titles and axes, table text, footnotes and speaker notes are written in English with UK spelling (organisation, programme, optimise, colour, centre, analyse, licence/license rules, dd/mm/yyyy dates, £/€ as given). If the user's notes, data or request are in Spanish or another language, translate the content into British English; keep proper names, product names and quoted terms as they are. Reply to the user in the language they use; only the deck is in English. `Deck.save()` tags all text as en-GB.
 - Sentence case everywhere, no full-uppercase paragraphs (short labels and KPI captions in caps are the exception).
 - Body text never below 9 pt on cards, 8 pt for source lines; keep slides scannable: short statements, numbers large, one idea per card.
 - Every content slide has a source/notes line via `footnote()` when it shows data. Include units and period in chart titles.
