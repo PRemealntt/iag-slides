@@ -27,3 +27,7 @@ Transparent PNG, ≤ 500 px high, cropped, saved as `skills/iag-slides/assets/br
 
 ## Requirements
 Python 3 with `python-pptx`, `Pillow`, `lxml`; LibreOffice and `pdftoppm` for rendering checks.
+
+## Portable Python (Windows)
+`skills/iag-slides/runtime/win/python/` is the official Python *embeddable* package (same version as the dev machine) with the three libraries installed in `Lib/site-packages`, so Windows users install nothing. It is committed to the repo (~50 MB). `python<ver>._pth` enables `Lib\site-packages` and `import site`.
+To rebuild or upgrade it: download `python-<ver>-embed-amd64.zip` from python.org, extract to that folder, restore the `._pth` lines (`python<ver>.zip`, `.`, `Lib\site-packages`, `import site`), then `py -m pip install --target runtime/win/python/Lib/site-packages --no-compile python-pptx Pillow lxml` using the same Python version. Test: `runtime/win/python/python.exe skills/iag-slides/scripts/build_examples.py <tmp>.pptx`. macOS has no bundled runtime yet (SKILL.md falls back to system Python).

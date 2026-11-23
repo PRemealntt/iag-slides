@@ -19,7 +19,12 @@ Read these before building (progressive disclosure, load only what the task need
 1. **Clarify the content, not the format.** Identify purpose, audience, number of slides, the data and the message. If the user gave a document, notes or numbers, read them fully first. Ask at most one short question if something blocks the work (for example no data for a chart); otherwise decide and state assumptions at the end.
 2. **Plan the storyline.** One message per slide. Typical deck: cover → content slides (executive summary first for 5+ slides) → next steps → closing slide (cover and closing are mandatory; no dividers unless asked). Write each slide as: title `Topic | Subtopic` and an orange subtitle that states the conclusion ("so what") in one sentence.
 3. **Pick a pattern per slide** from `references/patterns.md`. Favour the reference patterns whenever the content fits their structure (KPIs + chart + insights, A-vs-B comparison, opportunity with cards and next steps, numbered Q&A grid, scenario comparison, dark photo slide with lever cards, chevron timeline). Vary patterns across the deck. If the content does not fit any of them (long narrative, a single big chart, a dense table, a process with many steps), choose a different layout from `references/layouts.md` or compose from the components, keep the same visual language, and mention the choice to the user in one line.
-4. **Write the build script** (python, kept outside the output folder), import the library, build slides, save the `.pptx`:
+4. **Pick the Python to run it** (the user must not have to install anything). Use the bundled portable Python when it exists for this OS, otherwise the system Python:
+   - Windows: `"<this skill's folder>/runtime/win/python/python.exe" script.py` — it already includes python-pptx, Pillow and lxml. Always quote the path (it contains spaces).
+   - Any other case (macOS/Linux, or the `runtime/` folder is missing): use `python3` (or `py` on Windows). If `import pptx, PIL, lxml` fails, run `python3 -m pip install python-pptx Pillow lxml` and tell the user you did.
+   Use that same interpreter for `build_examples.py`, the text QA and any other script below.
+
+   **Write the build script** (python, kept outside the output folder), import the library, build slides, save the `.pptx`:
    ```python
    import sys; sys.path.insert(0, "<this skill's folder>/scripts")
    from iag_deck import *
@@ -33,7 +38,7 @@ Read these before building (progressive disclosure, load only what the task need
    ```
    `scripts/build_examples.py` is a working example that uses every component: read it for call signatures, run it to see the output. Use only python-pptx; never edit the template layouts or master.
 5. **QA (required).**
-   - Text: `python -c` or any extractor to confirm every figure and label is right and no placeholder text remains.
+   - Text: the same Python (`-c`) or any extractor to confirm every figure and label is right and no placeholder text remains.
    - Visual: convert to PDF with LibreOffice (`soffice --headless --convert-to pdf`; if bare `soffice` hangs, use the wrapper script available in the environment), rasterise with `pdftoppm -jpeg -r 80`, and look at every slide. Fix text overflow, overlaps, text touching card edges, low contrast, uneven gaps, and charts whose labels collide. Re-render after fixes.
 6. **Deliver** the `.pptx` and one or two sentences: what was built, any assumption, and the pattern choices that departed from the references. Offer a concrete next step (for example adding speaker notes).
 
