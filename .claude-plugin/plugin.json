@@ -1,0 +1,9 @@
+{
+  "name": "iag-slides",
+  "version": "0.2.0",
+  "description": "Genera presentaciones PowerPoint con el formato corporativo IAG Transform (plantilla, colores, tipografía, logos, iconos) y patrones de slide de referencia.",
+  "author": {
+    "name": "IAG Transform"
+  },
+  "keywords": ["slides", "powerpoint", "template", "branding", "IAG Transform"]
+}

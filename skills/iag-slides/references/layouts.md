@@ -1,0 +1,64 @@
+# Template layouts (58)
+
+Use `Deck.content_slide / title_slide / divider_slide / statement_slide / end_slide` for the common ones; any other layout by exact name via `deck._new(name)` and fill placeholders by `placeholder_format.idx`.
+
+Never edit or rename the layouts. Placeholder idx in brackets.
+
+- **Title Slide [Dark/Texture 1]** — 0:center_title, 1:subtitle
+- **Title Slide [Dark/Texture 2]** — 1:subtitle, 0:center_title
+- **Title Slide [Colour/Texture 1]** — 1:subtitle, 0:center_title
+- **Title Slide [Colour/Texture 2]** — 1:subtitle, 0:center_title
+- **Title Slide [White/Texture 1]** — 1:subtitle, 0:center_title
+- **Title Slide [White/Texture 2]** — 1:subtitle, 0:center_title
+- **Title Slide [Orange Elements 1]** — 1:subtitle, 0:center_title
+- **Title Slide [Orange Elements 2]** — 1:subtitle, 0:center_title
+- **Title Slide [Image 1]** — 1:subtitle, 0:center_title
+- **Title Slide [Image 2]** — 1:subtitle, 0:center_title
+- **Title Slide [Image 3]** — 1:subtitle, 0:center_title
+- **Title Slide [Image 4]** — 1:subtitle, 0:center_title
+- **Title Slide [Dark + 50% Image]** — 0:center_title, 1:subtitle, 13:picture
+- **Title Slide [White + 50% Image]** — 0:center_title, 1:subtitle, 13:picture
+- **Title Slide [Colour + 50% Image]** — 0:center_title, 1:subtitle, 13:picture
+- **Contents Slide** — 1:object, 0:title
+- **Table 1** — 0:title, 13:table
+- **Table 2** — 13:table, 0:title
+- **Table 3** — 13:table, 0:title
+- **Title and Content** — 0:title, 1:object
+- **Title and Two Content** — 1:object, 13:object, 0:title
+- **Title and Content (Subtitle)** — 0:title, 1:object, 10:body
+- **Title and Two Content (Subtitle)** — 1:object, 13:object, 0:title, 10:body
+- **Divider Slide [Colour]** — 0:center_title, 13:body
+- **Divider Slide [Dark Image]** — 0:center_title, 13:body
+- **Divider Slide [Light Image]** — 0:center_title, 13:body
+- **Divider Slide 1** — 13:picture, 0:center_title, 11:body
+- **Title and Text + Image [White]** — 13:picture, 0:title, 1:object
+- **Title and Text + Image Left** — 13:picture, 0:title, 1:object
+- **Title and Text + Image [Colour]** — 13:picture, 0:title, 1:object
+- **Title and Text + Image [Colour] Left** — 13:picture, 0:title, 1:object
+- **Title and Text + Image [Dark]** — 13:picture, 0:title, 1:object
+- **Title and Text + Image [Dark] Left** — 13:picture, 0:title, 1:object
+- **Statement [Colour]** — 0:center_title
+- **Statement [Dark]** — 0:center_title
+- **Statement [White]** — 0:center_title
+- **Impact Statement** — 0:center_title
+- **Impact Statement (Dark Image)** — 13:picture, 0:center_title
+- **3 Column Text ** — 0:title, 18:object, 19:object, 20:object
+- **4 Column Text ** — 0:title, 18:object, 19:object, 20:object, 21:object
+- **6 Column Text ** — 0:title, 18:object, 19:object, 20:object, 22:object, 23:object, 24:object
+- **8 Column Text ** — 0:title, 18:object, 19:object, 20:object, 21:object, 22:object, 23:object, 24:object, 25:object
+- **4 Column Icon Text** — 0:title, 18:object, 24:object, 25:object, 21:object, 13:body, 14:picture, 16:body, 17:picture, 19:body, 20:picture, 22:body, 23:picture
+- **Title + 3-Column Text/Image** — 24:picture, 21:object, 0:title, 22:object, 23:object, 25:picture, 27:picture, 28:object, 29:object, 30:object
+- **End slide** — 
+- **Contents Slide 2** — 0:title, 13:table
+- **Half coloured** — 1:object, 0:title, 10:object
+- **Title and Text + 3 Images [White]** — 15:picture, 16:body, 13:picture, 0:title, 1:object, 14:body, 17:picture, 18:body
+- **Title and Text + 6 Images [Blue]** — 13:picture, 14:picture, 0:title, 1:object, 15:picture, 16:picture, 17:picture, 18:picture
+- **2 Images With Text** — 14:picture, 15:picture, 1:object, 13:object
+- **OpCo - Iberia** — 
+- **OpCo - Iberia Express** — 
+- **OpCo - British Airways** — 
+- **OpCo - Vueling** — 
+- **OpCo - Aer Lingus** — 
+- **OpCo - IAG Loyalty** — 
+- **OpCo - IAG Cargo** — 
+- **OpCo - Levels** — 

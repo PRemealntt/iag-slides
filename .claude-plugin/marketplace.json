@@ -1,0 +1,21 @@
+{
+  "name": "iag-transform",
+  "owner": {
+    "name": "IAG Transform"
+  },
+  "metadata": {
+    "description": "Marketplace de plugins de IAG Transform para Claude Code."
+  },
+  "plugins": [
+    {
+      "name": "iag-slides",
+      "source": "./",
+      "description": "Genera presentaciones PowerPoint con el formato corporativo IAG Transform (plantilla, colores, tipografía, logos, iconos) y patrones de slide de referencia.",
+      "version": "0.2.0",
+      "author": {
+        "name": "IAG Transform"
+      },
+      "keywords": ["slides", "powerpoint", "template", "branding", "IAG Transform"]
+    }
+  ]
+}
