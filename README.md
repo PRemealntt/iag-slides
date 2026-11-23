@@ -14,8 +14,8 @@ Plugin con una skill que genera presentaciones PowerPoint (.pptx) con el formato
 Antes de instalar, comprueba que tienes:
 - **Claude Code** (app de escritorio o terminal).
 - **Git**: el marketplace se descarga desde GitHub. Windows: `winget install --id Git.Git -e`.
-- **Windows: no hace falta instalar nada más.** El plugin incluye su propio Python portátil (`skills/iag-slides/runtime/win/`) con las librerías necesarias.
-- **macOS / Linux**: de momento necesitan **Python 3** con las librerías (`pip install python-pptx Pillow lxml`). Claude puede instalarlas si se lo pides.
+- **Windows y Mac con chip Apple (M1 o posterior): no hace falta instalar nada más.** El plugin incluye su propio Python portátil con las librerías (`skills/iag-slides/runtime/win/` y `runtime/macos-arm64/`); Claude usa el que corresponde a tu ordenador.
+- **Mac con Intel o Linux**: necesitan **Python 3** con las librerías (`pip install python-pptx Pillow lxml`). Claude puede instalarlas si se lo pides.
 - **LibreOffice** (opcional pero recomendado): permite revisar visualmente las slides antes de entregarlas. Sin él, el .pptx se genera igual pero no se renderiza para revisión.
 
 ## Instalación
