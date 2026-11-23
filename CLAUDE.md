@@ -14,6 +14,9 @@ Plugin with one skill (`skills/iag-slides`) that builds PowerPoint decks in the 
 - Palette/typography only from `references/design-system.md` (Arial; Asphalt, Orange, tints).
 - Show the logo of every supplier / group company that is named; logos are loose (no frame) by default; faded + "Not bidding" when not participating. Missing logo → text + tell the user.
 - No real company data in this repo: examples, docs and previews use invented figures and generic names. Do not add the original source decks.
+- The classic IAG look (Asphalt, Orange, tints) is the default. RAG colours are an occasional exception, only for status pills / error segments when the content really is a status; other teams' navy, green or shadows are mapped to the palette.
+- Cover, closing slide, titles, subtitles and dividers follow the rules in SKILL.md (mandatory cover and closing, no dividers unless asked). New patterns must fit that format, not change it.
+- No footnotes, source lines or notes at the bottom of content slides.
 - Never edit or rename template layouts.
 
 ## After any change to `iag_deck.py`, patterns or components

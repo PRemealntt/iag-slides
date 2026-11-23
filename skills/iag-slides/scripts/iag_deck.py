@@ -48,6 +48,12 @@ ORANGE_3 = "FDD9C4"     # light orange (soft highlight cells)
 LIGHT_BLUE = "E0F2F3"   # primary light
 PANEL = "F2F7F8"        # very light panel background used in the model slides
 WHITE = "FFFFFF"
+# Status (RAG) colours: ONLY for Green/Amber/Red status pills and error segments, nowhere else
+RAG_GREEN_BG, RAG_GREEN_FG = "CDEEDB", "0B3B2A"
+RAG_AMBER_BG, RAG_AMBER_FG = "FDD9C4", "7A3A0A"
+RAG_RED_BG, RAG_RED_FG = "F6D1CD", "7A1A12"
+ALERT_RED = "B42318"
+TOTAL_ROW = "E0F2F3"
 BLACK = "1D1D1B"
 CLASSIFICATION = "INTERNAL USE ONLY │ NOT FOR ONWARD DISTRIBUTION"
 
@@ -489,9 +495,12 @@ def comparison_table(slide, x, y, w, row_labels, col_heads, cells, label_w=2.4, 
 
 
 def simple_table(slide, x, y, w, data, col_widths=None, row_h=0.32, size=10, highlight=(),
-                 first_col_bold=True, align_numbers=True):
-    """Compact brand table. data[0] is the header row. highlight = {(row, col), ...} (0-based incl. header)
-    shown in orange tint. Header asphalt/white, body light panel, no borders."""
+                 first_col_bold=True, align_numbers=True, total_rows=(), sub_rows=(), orange_cols=(),
+                 header_size=None):
+    """Compact brand table. data[0] is the header row. highlight = {(row, col), ...} in orange tint.
+    total_rows = rows shown bold on light blue (e.g. "Total"); sub_rows = full-width italic caption rows
+    (e.g. "For information | not included in total", merged across the columns);
+    orange_cols = columns whose numbers are bold orange. Header asphalt/white, body light panel, no borders."""
     from pptx.oxml.ns import qn as _qn
     rows, cols = len(data), len(data[0])
     gf = slide.shapes.add_table(rows, cols, Inches(x), Inches(y), Inches(w), Inches(row_h * rows))
@@ -508,26 +517,183 @@ def simple_table(slide, x, y, w, data, col_widths=None, row_h=0.32, size=10, hig
             tbl.columns[i].width = Inches(w * cw / tot)
     for r in range(rows):
         tbl.rows[r].height = Inches(row_h)
+        if r in sub_rows:
+            tbl.cell(r, 0).merge(tbl.cell(r, cols - 1))
         for c in range(cols):
             cell = tbl.cell(r, c)
+            if r in sub_rows and c > 0:
+                continue
             cell.margin_left = cell.margin_right = Inches(0.08)
             cell.margin_top = cell.margin_bottom = Inches(0.02)
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             cell.fill.solid()
             if r == 0:
                 cell.fill.fore_color.rgb = rgb(ASPHALT)
+            elif r in total_rows or r in sub_rows:
+                cell.fill.fore_color.rgb = rgb(TOTAL_ROW if r in total_rows else WHITE)
             elif (r, c) in highlight:
                 cell.fill.fore_color.rgb = rgb(ORANGE_3)
             else:
-                cell.fill.fore_color.rgb = rgb(PANEL)
-            tf = cell.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            if c > 0 and align_numbers:
-                p.alignment = PP_ALIGN.CENTER
-            col = WHITE if r == 0 else ASPHALT
-            _fill_paragraph(p, str(data[r][c]), size, col, r == 0 or (c == 0 and first_col_bold) or (r, c) in highlight)
+                cell.fill.fore_color.rgb = rgb(PANEL if r % 2 else WHITE)
+            p = cell.text_frame.paragraphs[0]
+            cell.text_frame.word_wrap = True
+            if c > 0 and align_numbers and r not in sub_rows:
+                p.alignment = PP_ALIGN.CENTER if r == 0 else PP_ALIGN.RIGHT
+            col, bold, ital = ASPHALT, (c == 0 and first_col_bold) or (r, c) in highlight or r in total_rows, False
+            if r == 0:
+                col, bold = WHITE, True
+            elif r in sub_rows:
+                bold, ital = True, False
+            elif c in orange_cols:
+                col, bold = ORANGE, True
+            sz = (header_size or size) if r == 0 else size
+            _fill_paragraph(p, str(data[r][c]), sz, col, bold, ital)
     return gf
+
+
+# ------------------------------------------------------------------------------------------
+# Dashboard blocks (status pills, KPI tiles, split bars, numbered lists, trackers)
+# ------------------------------------------------------------------------------------------
+def draft_tag(slide, text="DRAFT"):
+    """Small 'DRAFT' marker at the top right (above the logo)."""
+    return add_text(slide, 11.4, 0.08, 1.54, 0.25, text, size=11, color=ASPHALT, align="r", name="Draft tag")
+
+
+def status_pill(slide, x, y, w, text, kind="neutral", h=0.3, size=9.5):
+    """Rounded pill. kind: green / amber / red (RAG status only), orange (light orange) or neutral (light grey)."""
+    fills = {"green": (RAG_GREEN_BG, RAG_GREEN_FG), "amber": (RAG_AMBER_BG, RAG_AMBER_FG),
+             "red": (RAG_RED_BG, RAG_RED_FG), "orange": (ORANGE_3, ASPHALT), "neutral": (PANEL, ASPHALT)}
+    bg, fg = fills[kind]
+    box(slide, x, y, w, h, fill=bg, radius=0.5, name="Status pill")
+    add_text(slide, x, y, w, h, text, size=size, bold=True, color=fg, align="c", anchor="m")
+
+
+def kpi_tile(slide, x, y, w, h, value, label, sub=None, dark=True, sub_color=ORANGE, value_size=26):
+    """Dark tile with a big white value and a small label (sub = optional orange note below)."""
+    box(slide, x, y, w, h, fill=ASPHALT if dark else PANEL, radius=0.08, name="KPI tile")
+    fg = WHITE if dark else ASPHALT
+    paras = [(value, {"size": value_size, "bold": True, "color": fg}), (label, {"size": 10, "color": "DCE5E7" if dark else ASPHALT_1})]
+    if sub:
+        paras.append((sub, {"size": 9, "color": sub_color}))
+    add_text(slide, x + 0.15, y + 0.05, w - 0.3, h - 0.1, paras, anchor="m")
+
+
+def mini_stat(slide, x, y, w, h, caption, value, orange=False, value_size=22):
+    """Light tile: small caps caption on top, big value below (tracker style)."""
+    box(slide, x, y, w, h, fill=PANEL, radius=0.08, name="Mini stat")
+    add_text(slide, x + 0.14, y + 0.08, w - 0.2, 0.22, caption.upper(), size=8, bold=True, color=ASPHALT_1)
+    add_text(slide, x + 0.14, y + 0.3, w - 0.2, h - 0.34, value, size=value_size, bold=True,
+             color=ORANGE if orange else ASPHALT, anchor="m")
+
+
+def split_bar(slide, x, y, w, h, segments, size=10):
+    """Horizontal split bar. segments = [(label, value, fill, text_color), ...], widths proportional to value."""
+    total = float(sum(s[1] for s in segments))
+    cx = x
+    for label, val, fill, fg in segments:
+        sw = w * val / total
+        box(slide, cx, y, sw, h, fill=fill, radius=0, name="Split segment")
+        if label:
+            add_text(slide, cx + 0.05, y, sw - 0.1, h, label, size=size, bold=True, color=fg, align="c", anchor="m")
+        cx += sw
+
+
+def status_mix(slide, x, y, w, items, colors=(ASPHALT, ASPHALT_2, ORANGE, ALERT_RED), row_h=0.3, bar_h=0.2):
+    """Thin stacked bar + legend rows with count and % (right aligned). items = [(label, count), ...]."""
+    total = float(sum(c for _, c in items))
+    split_bar(slide, x, y, w, bar_h, [("", c, colors[i % len(colors)], WHITE) for i, (_, c) in enumerate(items) if c > 0])
+    ry = y + bar_h + 0.2
+    for i, (label, c) in enumerate(items):
+        box(slide, x, ry + 0.07, 0.14, 0.14, fill=colors[i % len(colors)], radius=0)
+        add_text(slide, x + 0.3, ry, w * 0.5, row_h, label, size=10.5, anchor="m")
+        tb = add_text(slide, x + w * 0.5, ry, w * 0.5, row_h, f"**{c:,}**  ", size=10.5, align="r", anchor="m")
+        r = tb.text_frame.paragraphs[0].add_run()
+        r.text = f"({100 * c / total:.1f}%)"
+        r.font.size = Pt(10.5)
+        r.font.color.rgb = rgb(ASPHALT_1)
+        ry += row_h + 0.07
+    return ry
+
+
+def metric_strip(slide, x, y, w, h, metrics, note=None, note_caption="CURRENT POSITION"):
+    """Dark strip with captions (orange caps) over big values, optional note on the right.
+    metrics = [(CAPTION, value, orange_bool), ...]"""
+    box(slide, x, y, w, h, fill=ASPHALT, radius=0.1, name="Metric strip")
+    note_w = 2.9 if note else 0
+    cw = (w - 0.4 - note_w) / len(metrics)
+    for i, (cap, val, orange) in enumerate(metrics):
+        add_text(slide, x + 0.3 + i * cw, y + 0.12, cw - 0.1, 0.25, cap.upper(), size=8.5, bold=True, color=ORANGE)
+        add_text(slide, x + 0.3 + i * cw, y + 0.4, cw - 0.1, h - 0.5, val, size=24, bold=True,
+                 color=ORANGE if orange else WHITE, anchor="m")
+    if note:
+        add_text(slide, x + w - note_w - 0.15, y + 0.12, note_w, 0.25, note_caption, size=8.5, bold=True, color=ORANGE)
+        add_text(slide, x + w - note_w - 0.15, y + 0.4, note_w, h - 0.5, note, size=11, color="DCE5E7", anchor="m")
+
+
+def tracker_panel(slide, x, y, w, h, title, total, pending, resolved, mix, colors=(ASPHALT, ASPHALT_2, ORANGE, ALERT_RED)):
+    """White card: title, three mini stats (total / pending / resolved) and a status mix bar with legend."""
+    box(slide, x, y, w, h, fill=WHITE, radius=0.04, line=ASPHALT_3, name="Tracker panel")
+    add_text(slide, x + 0.2, y + 0.12, w - 0.4, 0.35, title, size=14, bold=True)
+    tw = (w - 0.4 - 0.2) / 3
+    for i, (cap, val, orange) in enumerate([("Total", total, False), ("Pending", pending, True), ("Resolved", resolved, False)]):
+        mini_stat(slide, x + 0.2 + i * (tw + 0.1), y + 0.58, tw, 0.95, cap, f"{val:,}", orange=orange)
+    add_text(slide, x + 0.2, y + 1.7, 3, 0.22, "STATUS MIX", size=8.5, bold=True, color=ASPHALT_1)
+    status_mix(slide, x + 0.2, y + 2.0, w - 0.4, mix, colors)
+
+
+def banner(slide, x, y, w, h, text, size=13):
+    """Dark rounded band with a one- or two-line key statement (bold white)."""
+    box(slide, x, y, w, h, fill=ASPHALT, radius=0.12, name="Banner")
+    add_text(slide, x + 0.3, y, w - 0.6, h, text, size=size, bold=True, color=WHITE, anchor="m")
+
+
+def numbered_list_panel(slide, x, y, w, h, header, items, header_color=ORANGE, circle=ORANGE, body_size=10):
+    """White card with a caps header and rows: numbered circle + bold title + grey body, on light panels.
+    items = [(title, body), ...]"""
+    box(slide, x, y, w, h, fill=WHITE, radius=0.04, line=ASPHALT_3, name="List panel")
+    add_text(slide, x + 0.25, y + 0.1, w - 0.5, 0.3, header.upper(), size=10, bold=True, color=header_color, anchor="m")
+    n = len(items)
+    top = y + 0.5
+    gap = 0.1
+    rh = (h - 0.5 - 0.15 - gap * (n - 1)) / n
+    for i, (title, body) in enumerate(items):
+        ry = top + i * (rh + gap)
+        box(slide, x + 0.2, ry, w - 0.4, rh, fill=PANEL, radius=0.08, name="List row")
+        d = min(0.34, rh - 0.1)
+        o = box(slide, x + 0.35, ry + (rh - d) / 2, d, d, fill=circle, radius=0, shape=MSO_SHAPE.OVAL)
+        add_text(slide, x + 0.35, ry + (rh - d) / 2, d, d, str(i + 1), size=10, bold=True, color=WHITE, align="c", anchor="m")
+        add_text(slide, x + 0.85, ry, w - 1.2, rh, [(title, {"size": body_size + 2, "bold": True}),
+                                                  (body, {"size": body_size, "color": ASPHALT_1})], anchor="m")
+
+
+def column_card(slide, x, y, w, h, label, title, big, caption, bullets):
+    """White card: orange caps label, bold title, big orange figure + caption, bullets on a light panel."""
+    box(slide, x, y, w, h, fill=WHITE, radius=0.05, line=ASPHALT_3, name="Column card")
+    add_text(slide, x + 0.25, y + 0.15, w - 0.5, 0.25, label.upper(), size=9.5, bold=True, color=ORANGE)
+    add_text(slide, x + 0.25, y + 0.42, w - 0.5, 0.35, title, size=14, bold=True)
+    add_text(slide, x + 0.25, y + 0.95, 1.7, 0.8, big, size=34, bold=True, color=ORANGE, anchor="m")
+    add_text(slide, x + 2.0, y + 0.95, w - 2.25, 0.8, caption, size=10.5, bold=True, anchor="m")
+    box(slide, x + 0.2, y + 1.95, w - 0.4, h - 2.15, fill=PANEL, radius=0.06)
+    add_text(slide, x + 0.4, y + 2.05, w - 0.8, h - 2.35, ["\u2022 " + b for b in bullets], size=10.5, space_after=5, anchor="m")
+
+
+def next_band(slide, x, y, w, h, label, title, body, pill=None):
+    """Dark closing band: orange caps label | bold title + body | optional pill on the right."""
+    box(slide, x, y, w, h, fill=ASPHALT, radius=0.1, name="Next band")
+    add_text(slide, x + 0.3, y, 1.2, h, label.upper(), size=11, bold=True, color=ORANGE, anchor="m")
+    add_text(slide, x + 1.6, y, w - 4.8, h, [(title, {"size": 12, "bold": True, "color": WHITE}),
+                                            (body, {"size": 10, "color": "DCE5E7"})], anchor="m")
+    if pill:
+        status_pill(slide, x + w - 3.1, y + (h - 0.4) / 2, 2.9, pill, kind="orange", h=0.4, size=8.5)
+
+
+def numbered_steps(slide, x, y, w, items, row_h=0.62):
+    """Compact vertical list: dark numbered circle + bold title + grey sub-line. items = [(title, sub), ...]"""
+    for i, (title, sub) in enumerate(items):
+        ry = y + i * row_h
+        box(slide, x, ry + 0.07, 0.3, 0.3, fill=ASPHALT, radius=0, shape=MSO_SHAPE.OVAL)
+        add_text(slide, x, ry + 0.07, 0.3, 0.3, str(i + 1), size=10, bold=True, color=WHITE, align="c", anchor="m")
+        add_text(slide, x + 0.45, ry, w - 0.45, row_h, [(title, {"size": 11, "bold": True}), (sub, {"size": 9, "color": ASPHALT_1})], anchor="m")
 
 
 # ------------------------------------------------------------------------------------------
@@ -709,9 +875,11 @@ class Deck:
         self._has_cover = True
         return s
 
-    def content_slide(self, title, subtitle="", layout="Title and Content (Subtitle)"):
-        """Title (32 pt bold) + orange subtitle line. Body area is free for components."""
+    def content_slide(self, title, subtitle="", layout="Title and Content (Subtitle)", draft=False):
+        """Title (32 pt bold) + orange subtitle line. Body area is free for components. draft=True adds the DRAFT tag."""
         s = self._new(layout)
+        if draft:
+            draft_tag(s)
         for ph in list(s.placeholders):
             idx = ph.placeholder_format.idx
             if idx == 0:
@@ -721,6 +889,38 @@ class Deck:
                 ph.left, ph.top, ph.width, ph.height = Inches(0.39), Inches(0.88), Inches(12.55), Inches(0.7)
             else:
                 ph._element.getparent().remove(ph._element)
+        return s
+
+    def agenda_slide(self, items, title="Agenda", draft=False):
+        """Agenda: one white card per item with a big orange number. items = list of strings (max 6)."""
+        s = self._new("Title and Content")
+        for ph in list(s.placeholders):
+            if ph.placeholder_format.idx == 0:
+                ph.text_frame.text = title
+            else:
+                ph._element.getparent().remove(ph._element)
+        if draft:
+            draft_tag(s)
+        n = len(items)
+        gap = 0.18
+        h = min(1.0, (5.1 - gap * (n - 1)) / n)
+        for i, it in enumerate(items):
+            y = 1.55 + i * (h + gap)
+            box(s, 0.39, y, 12.55, h, fill=WHITE, radius=0.05, line=ASPHALT_3, name="Agenda card")
+            add_text(s, 0.75, y, 1.0, h, f"{i + 1:02d}", size=28, bold=True, color=ORANGE, anchor="m")
+            add_text(s, 1.95, y, 10.5, h, it, size=20, bold=True, anchor="m")
+        return s
+
+    def tracker_slide(self, title, subtitle, overall, panels, definition, draft=False):
+        """Status tracker slide: dark strip with totals + two panels (e.g. Airports / Group).
+        overall = (total_items_text, resolved, progress_pct_text, pending); panels = [(name, total, pending, resolved, mix), x2]
+        mix = [(label, count), ...] (4 statuses max). definition = text shown in the strip."""
+        s = self.content_slide(title, subtitle, draft=draft)
+        total, resolved, progress, pending = overall
+        metric_strip(s, 0.39, 1.55, 12.55, 0.95, [("Overall total", total, False), ("Resolved", resolved, False),
+                                                    ("Progress", progress, True), ("Pending", pending, False)], note=definition)
+        for i, (name, tot, pend, res, mix) in enumerate(panels):
+            tracker_panel(s, 0.39 + i * 6.35, 2.7, 6.2, 3.95, name, tot, pend, res, mix)
         return s
 
     def divider_slide(self, title, number="", layout="Divider Slide [Colour]"):

@@ -1,7 +1,7 @@
 # IAG Transform design system (from the official template)
 
 ## Canvas and grid
-- 16:9, 13.333 × 7.5 in. Safe margins: left/right 0.39 in (content spans x 0.39 → 12.94, width 12.55), top 0.19 in, bottom content limit y ≈ 6.7; footnote at y 6.86; slide number at x 12.2, y 6.95.
+- 16:9, 13.333 × 7.5 in. Safe margins: left/right 0.39 in (content spans x 0.39 → 12.94, width 12.55), top 0.19 in, bottom content limit y ≈ 6.7 (nothing below it: no footnotes or source lines); slide number at x 12.2, y 6.95.
 - 4-column grid: use 3, 4, 6 or 8 equal columns with 0.2 in gutters. Gaps between blocks 0.15–0.25 in; keep gutters constant within a slide.
 - Title placeholder: x 0.39, y 0.19, 32 pt Arial Bold, asphalt. Orange subtitle: x 0.39, y 0.88, ~20 pt bold orange (provided by the layout). Content starts at y ≈ 1.70.
 
@@ -17,6 +17,7 @@
 | Light primary | Light blue | `E0F2F3` |
 | Panels on white slides | Panel | `F2F7F8` |
 | Black / white | | `1D1D1B` / `FFFFFF` |
+**Status colours (occasional exception):** the classic IAG look (Asphalt, Orange, tints) is the default and must dominate every deck. Use status colours only on a slide whose content really is a status (RAG health, tracker), never as decoration. Green/Amber/Red pills use `RAG_*` pastel fills with dark text, and a single red (`ALERT_RED`) is allowed for an "Error" segment in a status mix. Nothing else may be green or red. Decks from other teams that use their own navy or green are mapped to the template: navy → Asphalt, positive green circles → Asphalt, soft shadows → none.
 Constants exist in `iag_deck.py` (`ASPHALT`, `ORANGE`, `PANEL`, ...). Do not use other colours. For series in charts use orange (focus) and asphalt (rest), then asphalt −2 and orange −2.
 
 ## Typography (Arial)
@@ -30,7 +31,7 @@ Constants exist in `iag_deck.py` (`ASPHALT`, `ORANGE`, `PANEL`, ...). Do not use
 | KPI value / KPI caption | 20 / 9 caps | Bold |
 | Body in cards | 10–12 | Regular, **bold** for the key phrase |
 | Chart labels | 10–11 | Bold for values |
-| Source / footnote | 8 | Regular, grey |
+| Source / footnote (only if the user asks) | 8 | Regular, grey |
 Highlight inside body text with bold, or bold orange for the one number or phrase that matters (`{{text}}` markup). Left-aligned, ragged right; centre only big numbers in white pills.
 
 ## Shapes
